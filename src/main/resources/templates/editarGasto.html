@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Editar Gasto - FinControl</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+        .navbar {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        .card {
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+        }
+        .form-control:focus, .form-select:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 0.25rem rgba(102, 126, 234, 0.25);
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+        }
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #5a6fd1 0%, #6a4492 100%);
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark mb-4">
+        <div class="container">
+            <a class="navbar-brand" href="/dashboard">
+                <i class="fas fa-wallet me-2"></i>
+                FinControl
+            </a>
+            <div class="d-flex">
+                <a href="/gastos/listar" class="btn btn-light me-2">
+                    <i class="fas fa-list"></i> Listar Gastos
+                </a>
+                <form th:action="@{/logout}" method="post">
+                    <button type="submit" class="btn btn-outline-light">Sair</button>
+                </form>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0">
+                            <i class="fas fa-edit me-2"></i>
+                            Editar Gasto
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <form th:action="@{/gastos/editar/{id}(id=${gasto.id})}"
+                              th:object="${gasto}"
+                              method="post"
+                              class="needs-validation"
+                              novalidate>
+
+                            <input type="hidden" th:field="*{id}" />
+
+                            <div class="mb-3">
+                                <label for="descricao" class="form-label">Descrição</label>
+                                <input type="text"
+                                       class="form-control"
+                                       id="descricao"
+                                       th:field="*{descricao}"
+                                       required>
+                                <div class="invalid-feedback">
+                                    Por favor, insira uma descrição.
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="valor" class="form-label">Valor (R$)</label>
+                                <input type="number"
+                                       class="form-control"
+                                       id="valor"
+                                       th:field="*{valor}"
+                                       step="0.01"
+                                       min="0.01"
+                                       required>
+                                <div class="invalid-feedback">
+                                    Por favor, insira um valor válido.
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="categoria" class="form-label">Categoria</label>
+                                <select class="form-select"
+                                        id="categoria"
+                                        th:field="*{categoria}"
+                                        required>
+                                    <option value="">Selecione uma categoria</option>
+                                    <option value="Alimentação">Alimentação</option>
+                                    <option value="Transporte">Transporte</option>
+                                    <option value="Moradia">Moradia</option>
+                                    <option value="Saúde">Saúde</option>
+                                    <option value="Educação">Educação</option>
+                                    <option value="Lazer">Lazer</option>
+                                    <option value="Outros">Outros</option>
+                                </select>
+                                <div class="invalid-feedback">
+                                    Por favor, selecione uma categoria.
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="dataGasto" class="form-label">Data do Gasto</label>
+                                <input type="datetime-local"
+                                       class="form-control"
+                                       id="dataGasto"
+                                       th:field="*{dataGasto}"
+                                       required>
+                                <div class="invalid-feedback">
+                                    Por favor, selecione a data do gasto.
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="observacoes" class="form-label">Observações</label>
+                                <textarea class="form-control"
+                                          id="observacoes"
+                                          th:field="*{observacoes}"
+                                          rows="3"></textarea>
+                            </div>
+
+                            <div class="d-grid gap-2">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-save me-2"></i>
+                                    Salvar Alterações
+                                </button>
+                                <a href="/gastos/listar" class="btn btn-secondary">
+                                    <i class="fas fa-times me-2"></i>
+                                    Cancelar
+                                </a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Validação do formulário
+        (function () {
+            'use strict'
+            var forms = document.querySelectorAll('.needs-validation')
+            Array.prototype.slice.call(forms)
+                .forEach(function (form) {
+                    form.addEventListener('submit', function (event) {
+                        if (!form.checkValidity()) {
+                            event.preventDefault()
+                            event.stopPropagation()
+                        }
+                        form.classList.add('was-validated')
+                    }, false)
+                })
+        })()
+    </script>
+</body>
+</html>
