@@ -2,6 +2,7 @@ package br.com.meuGasto.finControl.service;
 
 import br.com.meuGasto.finControl.entity.Gasto;
 import br.com.meuGasto.finControl.repository.GastoRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -14,11 +15,13 @@ import java.util.Optional;
 
 @Service
 @Transactional
+@RequiredArgsConstructor
 public class GastoService {
     
-    @Autowired
-    private GastoRepository gastoRepository;
-    
+    private final GastoRepository gastoRepository;
+    private final NotificacaoService notificacaoService;
+    private final UsuarioService usuarioService;
+
     // Operações CRUD básicas
     
     /**
@@ -28,7 +31,15 @@ public class GastoService {
         if (gasto.getDataGasto() == null) {
             gasto.setDataGasto(LocalDateTime.now());
         }
-        return gastoRepository.save(gasto);
+        Gasto gastoSalvo = gastoRepository.save(gasto);
+
+        // Envia notificação se necessário
+        String emailUsuario = usuarioService.getEmailUsuarioLogado();
+        if (emailUsuario != null) {
+            notificacaoService.notificarGastoAlto(gastoSalvo, emailUsuario);
+        }
+
+        return gastoSalvo;
     }
     
     /**

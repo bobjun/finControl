@@ -1,0 +1,14 @@
+# Template for email configuration - Copy this file to application-email.properties and fill in your credentials
+spring.mail.username=your-email@gmail.com
+spring.mail.password=your-app-specific-password
+
+# Note: For Gmail, you need to use an App Password instead of your regular password
+# To generate an App Password:
+# 1. Go to your Google Account settings
+# 2. Enable 2-Step Verification if not already enabled
+# 3. Go to Security > App passwords
+# 4. Generate a new app password for "Mail" and your app name
+# 5. Replace the values above with your actual email and app password
+
+# IMPORTANT: Never commit the actual application-email.properties file with real credentials
+# This is only a template to show the required format

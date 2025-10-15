@@ -101,13 +101,6 @@
 			<optional>true</optional>
 		</dependency>
 
-		<!-- ModelMapper -->
-		<dependency>
-			<groupId>org.modelmapper</groupId>
-			<artifactId>modelmapper</artifactId>
-			<version>3.1.1</version>
-		</dependency>
-
 		<!-- Spring Mail -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -122,6 +115,13 @@
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-aspects</artifactId>
+		</dependency>
+
+		<!-- ModelMapper para mapeamento de objetos -->
+		<dependency>
+			<groupId>org.modelmapper</groupId>
+			<artifactId>modelmapper</artifactId>
+			<version>3.1.1</version>
 		</dependency>
 	</dependencies>
 

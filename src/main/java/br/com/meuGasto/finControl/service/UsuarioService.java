@@ -3,6 +3,8 @@ package br.com.meuGasto.finControl.service;
 import br.com.meuGasto.finControl.entity.Usuario;
 import br.com.meuGasto.finControl.repository.UsuarioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -136,5 +138,16 @@ public class UsuarioService {
      */
     public boolean existeUsuario(Long id) {
         return usuarioRepository.existsById(id);
+    }
+
+    /**
+     * Obtém o email do usuário logado
+     */
+    public String getEmailUsuarioLogado() {
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if (principal instanceof UserDetails) {
+            return ((UserDetails) principal).getUsername();
+        }
+        return null;
     }
 }
