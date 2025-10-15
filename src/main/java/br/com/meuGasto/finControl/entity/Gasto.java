@@ -138,4 +138,8 @@ public class Gasto {
                 ", dataAtualizacao=" + dataAtualizacao +
                 '}';
     }
+
+    public String getData() {
+        return null;
+    }
 }
