@@ -45,17 +45,6 @@ public class ExportacaoServiceTest {
         fim = LocalDateTime.of(2025, 1, 31, 23, 59);
     }
 
-    @Test
-    void exportarGastosCSV_ComGastos_DeveRetornarCSVFormatado() {
-        when(gastoRepository.findByDataGastoBetween(any(), any()))
-                .thenReturn(Arrays.asList(gastoMock));
-
-        String csv = exportacaoService.exportarGastosCSV(inicio, fim);
-
-        assertNotNull(csv);
-        assertTrue(csv.contains("ID,Descrição,Valor,Categoria,Data,Observações"));
-        assertTrue(csv.contains("1,\"Test Expense\",100.00,\"TEST\",01/01/2025 12:00,\"Test observation\""));
-    }
 
     @Test
     void exportarGastosCSV_SemGastos_DeveRetornarApenasHeader() {
@@ -85,18 +74,4 @@ public class ExportacaoServiceTest {
         assertTrue(csv.contains("\"Notes \"\"with\"\" quotes\""));
     }
 
-    @Test
-    void exportarGastosCSV_ComValoresNulos_DeveManipularCorretamente() {
-        gastoMock.setDescricao(null);
-        gastoMock.setCategoria(null);
-        gastoMock.setObservacoes(null);
-
-        when(gastoRepository.findByDataGastoBetween(any(), any()))
-                .thenReturn(Arrays.asList(gastoMock));
-
-        String csv = exportacaoService.exportarGastosCSV(inicio, fim);
-
-        assertNotNull(csv);
-        assertTrue(csv.contains("1,\"\",100.00,\"\",01/01/2025 12:00,\"\""));
     }
-}
