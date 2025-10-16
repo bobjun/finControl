@@ -3,7 +3,7 @@ package br.com.meuGasto.finControl.service;
 import br.com.meuGasto.finControl.entity.Gasto;
 import br.com.meuGasto.finControl.repository.GastoRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
