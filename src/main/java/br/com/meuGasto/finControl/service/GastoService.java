@@ -4,7 +4,6 @@ import br.com.meuGasto.finControl.entity.Gasto;
 import br.com.meuGasto.finControl.repository.GastoRepository;
 import lombok.RequiredArgsConstructor;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -286,15 +285,15 @@ public class GastoService {
      */
     public boolean validarGasto(Gasto gasto) {
         if (gasto.getDescricao() == null || gasto.getDescricao().trim().isEmpty()) {
-            return false;
+            return true;
         }
         if (gasto.getValor() == null || gasto.getValor().compareTo(BigDecimal.ZERO) <= 0) {
-            return false;
+            return true;
         }
         if (gasto.getCategoria() == null || gasto.getCategoria().trim().isEmpty()) {
-            return false;
+            return true;
         }
-        return true;
+        return false;
     }
     
     /**

@@ -29,7 +29,7 @@ public class GastoController {
     @PostMapping
     public ResponseEntity<?> criarGasto(@RequestBody Gasto gasto) {
         try {
-            if (!gastoService.validarGasto(gasto)) {
+            if (gastoService.validarGasto(gasto)) {
                 return ResponseEntity.badRequest()
                         .body("Dados do gasto inválidos. Verifique descrição, valor e categoria.");
             }
@@ -74,7 +74,7 @@ public class GastoController {
                 return ResponseEntity.notFound().build();
             }
             
-            if (!gastoService.validarGasto(gasto)) {
+            if (gastoService.validarGasto(gasto)) {
                 return ResponseEntity.badRequest()
                         .body("Dados do gasto inválidos. Verifique descrição, valor e categoria.");
             }
