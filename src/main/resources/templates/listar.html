@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head><title>Planejamentos</title></head>
+<body>
+<h2>Planejamentos Mensais</h2>
+<a th:href="@{/planejamentos/novo}">Novo Planejamento</a>
+<table border="1">
+    <tr><th>Mês/Ano</th><th>Planejado</th><th>Ações</th></tr>
+    <tr th:each="p : ${planejamentos}">
+        <td th:text="${p.mesAno}"></td>
+        <td th:text="${p.valorPlanejadoTotal}"></td>
+        <td><a th:href="@{'/planejamentos/' + ${p.id} + '/resumo'}">Resumo</a></td>
+    </tr>
+</table>
+</body>
+</html>

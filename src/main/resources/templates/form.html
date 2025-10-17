@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head><title>Resumo Planejamento</title></head>
+<body>
+<h2>Resumo de [[${resumo.mesAno}]]</h2>
+<p>Planejado: R$ <b th:text="${resumo.planejado}"></b></p>
+<p>Gasto: R$ <b th:text="${resumo.gasto}"></b></p>
+
+<div th:if="${resumo.saldo >= 0}">
+    <p>Saldo disponível: R$ <b th:text="${resumo.saldo}"></b></p>
+</div>
+<div th:if="${resumo.saldo < 0}" style="color:red;">
+    <p>Limite ultrapassado em R$ <b th:text="${resumo.saldo.abs()}"></b></p>
+</div>
+
+<a th:href="@{/planejamentos}">Voltar</a>
+</body>
+</html>

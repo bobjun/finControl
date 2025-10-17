@@ -1,0 +1,11 @@
+<form th:action="@{/planejamentos/salvar}" th:object="${planejamento}" method="post"
+      xmlns:th="http://www.w3.org/1999/xhtml">
+    <input type="hidden" th:field="*{id}" />
+
+    <div>
+        <label>Mês/Ano (ex: 2025-10):</label>
+        <input type="text" th:field="*{mesAno}" required />
+    </div>
+
+    <button type="submit">Salvar</button>
+</form>

@@ -91,11 +91,11 @@
             <div class="row">
                 <div class="col-md-3">
                     <h5>Total de Gastos</h5>
-                    <h3 th:text="${'R$ ' + #numbers.formatDecimal(totalGastos, 1, 2)}">R$ 0,00</h3>
+                    <h3 th:text="${'R$ ' + #numbers.formatDecimal(totalGastos, 0, 'POINT', 2, 'COMMA')}">R$ 0,00</h3>
                 </div>
                 <div class="col-md-3">
                     <h5>Gastos do Mês</h5>
-                    <h3 th:text="${'R$ ' + #numbers.formatDecimal(gastosMes, 1, 2)}">R$ 0,00</h3>
+                    <h3 th:text="${'R$ ' + #numbers.formatDecimal(gastosMes, 0, 'POINT', 2, 'COMMA')}">R$ 0,00</h3>
                 </div>
                 <div class="col-md-3">
                     <h5>Total de Registros</h5>

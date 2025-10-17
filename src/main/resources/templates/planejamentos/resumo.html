@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Resumo Planejamento</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+          font-family: Arial, sans-serif;
+          background: #f8f9fa;
+          margin: 40px;
+          display: flex;
+          justify-content: center;
+        }
+        .card {
+          background: white;
+          max-width: 500px;
+          width: 100%;
+          border-radius: 16px;
+          box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+          padding: 24px;
+          text-align: center;
+        }
+        h2 {
+          margin-bottom: 20px;
+        }
+        .saldo-ok {
+          color: #28a745;
+          font-weight: bold;
+        }
+        .saldo-neg {
+          color: #dc3545;
+          font-weight: bold;
+        }
+        a {
+          text-decoration: none;
+          background: #007bff;
+          color: white;
+          padding: 8px 16px;
+          border-radius: 6px;
+        }
+        a:hover {
+          background: #0056b3;
+        }
+    </style>
+</head>
+<body>
+<div class="card">
+    <h2>Resumo de [[${resumo.mesAno}]]</h2>
+
+    <p>Planejado: R$ <b th:text="${resumo.planejado}"></b></p>
+    <p>Gasto: R$ <b th:text="${resumo.gasto}"></b></p>
+
+    <p th:if="${resumo.saldo >= 0}" class="saldo-ok">
+        Saldo disponível: R$ <b th:text="${resumo.saldo}"></b>
+    </p>
+    <p th:if="${resumo.saldo < 0}" class="saldo-neg">
+        Limite ultrapassado em R$ <b th:text="${resumo.saldo.abs()}"></b>
+    </p>
+
+    <canvas id="graficoDoughnut" width="300" height="300"></canvas>
+
+    <br><br>
+    <a th:href="@{/planejamentos}">Voltar</a>
+</div>
+
+<script th:inline="javascript">
+    /*<![CDATA[*/
+    const planejado = [[${resumo.planejado}]];
+    const gasto = [[${resumo.gasto}]];
+    const saldo = Math.max(planejado - gasto, 0);
+
+    const ctx = document.getElementById('graficoDoughnut').getContext('2d');
+    new Chart(ctx, {
+      type: 'doughnut',
+      data: {
+        labels: ['Gasto Realizado', 'Saldo Restante'],
+        datasets: [{
+          data: [gasto, saldo],
+          backgroundColor: [
+            gasto <= planejado ? 'rgba(75, 192, 192, 0.8)' : 'rgba(255, 99, 132, 0.8)',
+            'rgba(201, 203, 207, 0.6)'
+          ],
+          borderColor: ['white', 'white'],
+          borderWidth: 2
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          legend: {
+            position: 'bottom',
+            labels: { font: { size: 14 } }
+          },
+          title: {
+            display: true,
+            text: 'Distribuição do Planejamento Mensal',
+            font: { size: 16 }
+          },
+          tooltip: {
+            callbacks: {
+              label: function(context) {
+                return context.label + ': R$ ' +
+                  context.formattedValue.replace('.', ',');
+              }
+            }
+          }
+        }
+      }
+    });
+    /*]]>*/
+</script>
+</body>
+</html>

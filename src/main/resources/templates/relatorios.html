@@ -98,7 +98,7 @@
                     <div class="card-body text-center">
                         <i class="fas fa-money-bill-wave fa-2x mb-2"></i>
                         <h5>Total Gasto</h5>
-                        <h3 th:text="${'R$ ' + #numbers.formatDecimal(totalGastos, 1, 2)}">R$ 0,00</h3>
+                        <h3 th:text="${'R$ ' + #numbers.formatDecimal(totalGastos, 0, 'POINT', 2, 'COMMA')}">R$ 0,00</h3>
                     </div>
                 </div>
             </div>
@@ -107,7 +107,7 @@
                     <div class="card-body text-center">
                         <i class="fas fa-calendar-alt fa-2x mb-2"></i>
                         <h5>Média Mensal</h5>
-                        <h3 th:text="${'R$ ' + #numbers.formatDecimal(mediaMensal, 1, 2)}">R$ 0,00</h3>
+                        <h3 th:text="${'R$ ' + #numbers.formatDecimal(mediaMensal, 0, 'POINT', 2, 'COMMA')}">R$ 0,00</h3>
                     </div>
                 </div>
             </div>
@@ -116,7 +116,7 @@
                     <div class="card-body text-center">
                         <i class="fas fa-arrow-trend-up fa-2x mb-2"></i>
                         <h5>Maior Gasto</h5>
-                        <h3 th:text="${'R$ ' + #numbers.formatDecimal(maiorGasto, 1, 2)}">R$ 0,00</h3>
+                        <h3 th:text="${'R$ ' + #numbers.formatDecimal(maiorGasto, 0, 'POINT', 2, 'COMMA')}">R$ 0,00</h3>
                     </div>
                 </div>
             </div>
@@ -125,7 +125,7 @@
                     <div class="card-body text-center">
                         <i class="fas fa-arrow-trend-down fa-2x mb-2"></i>
                         <h5>Menor Gasto</h5>
-                        <h3 th:text="${'R$ ' + #numbers.formatDecimal(menorGasto, 1, 2)}">R$ 0,00</h3>
+                        <h3 th:text="${'R$ ' + #numbers.formatDecimal(menorGasto, 0, 'POINT', 2, 'COMMA')}">R$ 0,00</h3>
                     </div>
                 </div>
             </div>
@@ -191,7 +191,7 @@
                                         <td th:text="${#temporals.format(gasto.dataGasto, 'dd/MM/yyyy')}">01/01/2025</td>
                                         <td th:text="${gasto.descricao}">Descrição</td>
                                         <td th:text="${gasto.categoria}">Categoria</td>
-                                        <td th:text="${'R$ ' + #numbers.formatDecimal(gasto.valor, 1, 2)}">R$ 0,00</td>
+                                        <td th:text="${'R$ ' + #numbers.formatDecimal(gasto.valor, 0, 'POINT', 2, 'COMMA')}">R$ 0,00</td>
                                     </tr>
                                 </tbody>
                             </table>

@@ -59,4 +59,6 @@ public interface GastoRepository extends JpaRepository<Gasto, Long> {
            "ORDER BY total DESC")
     List<Object[]> findCategoriasSumarioPorPeriodo(@Param("inicio") LocalDateTime inicio,
                                                   @Param("fim") LocalDateTime fim);
+
+
 }
