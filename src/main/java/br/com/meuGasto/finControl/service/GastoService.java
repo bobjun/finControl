@@ -4,6 +4,7 @@ import br.com.meuGasto.finControl.entity.Gasto;
 import br.com.meuGasto.finControl.repository.GastoRepository;
 import lombok.RequiredArgsConstructor;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,6 +17,8 @@ import java.util.Optional;
 @Service
 @Transactional
 @RequiredArgsConstructor
+
+
 public class GastoService {
     
     private final GastoRepository gastoRepository;
@@ -23,6 +26,7 @@ public class GastoService {
     private final UsuarioService usuarioService;
 
     // Operações CRUD básicas
+
     
     /**
      * Salva um novo gasto
