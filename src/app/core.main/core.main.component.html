@@ -1,0 +1,17 @@
+<div class="dashboard-cards">
+    <mat-card>
+        <mat-card-title>Receitas</mat-card-title>
+        <mat-card-content>{{ receitas | currency:'BRL' }}</mat-card-content>
+    </mat-card>
+
+    <mat-card>
+        <mat-card-title>Despesas</mat-card-title>
+        <mat-card-content>{{ despesas | currency:'BRL' }}</mat-card-content>
+    </mat-card>
+</div>
+
+<canvas baseChart
+        [data]="pieChartData"
+        [options]="pieChartOptions"
+        chartType="pie">
+</canvas>
