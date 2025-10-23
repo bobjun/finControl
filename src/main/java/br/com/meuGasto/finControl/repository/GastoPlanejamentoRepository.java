@@ -1,7 +1,6 @@
 package br.com.meuGasto.finControl.repository;
 
 
-import br.com.meuGasto.finControl.entity.Gasto;
 import br.com.meuGasto.finControl.entity.GastoPlanejamento;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
