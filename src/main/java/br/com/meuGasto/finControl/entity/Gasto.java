@@ -1,145 +1,105 @@
 package br.com.meuGasto.finControl.entity;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.*;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.PositiveOrZero;
+import lombok.Getter;
+import lombok.Setter;
+
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "gastos")
+@Getter
+@Setter
 public class Gasto {
-    
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    
-    @NotBlank(message = "Descrição é obrigatória")
-    @Size(max = 255, message = "Descrição deve ter no máximo 255 caracteres")
-    @Column(nullable = false)
-    private String descricao;
-    
-    @NotNull(message = "Valor é obrigatório")
-    @DecimalMin(value = "0.01", message = "Valor deve ser maior que zero")
-    @Column(nullable = false, precision = 10, scale = 2)
-    private BigDecimal valor;
-    
-    @NotBlank(message = "Categoria é obrigatória")
-    @Size(max = 100, message = "Categoria deve ter no máximo 100 caracteres")
-    @Column(nullable = false)
-    private String categoria;
-    
-    @Column(name = "data_gasto")
+
+    @NotNull(message = "A data é obrigatória")
     private LocalDateTime dataGasto;
-    
-    @Size(max = 500, message = "Observações devem ter no máximo 500 caracteres")
-    @Column(length = 500)
+
+    @NotNull(message = "O valor é obrigatório")
+    @PositiveOrZero(message = "O valor deve ser maior ou igual a zero")
+    private BigDecimal valor;
+
+    @NotNull(message = "A descrição é obrigatória")
+    private String descricao;
+
     private String observacoes;
-    
-    @Column(name = "data_criacao")
+
     private LocalDateTime dataCriacao;
-    
-    @Column(name = "data_atualizacao")
     private LocalDateTime dataAtualizacao;
-    
-    // Construtores
-    public Gasto() {
-        this.dataCriacao = LocalDateTime.now();
-        this.dataAtualizacao = LocalDateTime.now();
-    }
-    
-    public Gasto(String descricao, BigDecimal valor, String categoria) {
-        this();
-        this.descricao = descricao;
-        this.valor = valor;
-        this.categoria = categoria;
-        this.dataGasto = LocalDateTime.now();
-    }
-    
-    // Getters e Setters
-    public Long getId() {
-        return id;
-    }
-    
-    public void setId(Long id) {
-        this.id = id;
-    }
-    
-    public String getDescricao() {
-        return descricao;
-    }
-    
-    public void setDescricao(String descricao) {
-        this.descricao = descricao;
-    }
-    
-    public BigDecimal getValor() {
-        return valor;
-    }
-    
-    public void setValor(BigDecimal valor) {
-        this.valor = valor;
-    }
-    
-    public String getCategoria() {
-        return categoria;
-    }
-    
-    public void setCategoria(String categoria) {
-        this.categoria = categoria;
-    }
-    
-    public LocalDateTime getDataGasto() {
-        return dataGasto;
-    }
-    
-    public void setDataGasto(LocalDateTime dataGasto) {
-        this.dataGasto = dataGasto;
-    }
-    
-    public String getObservacoes() {
-        return observacoes;
-    }
-    
-    public void setObservacoes(String observacoes) {
-        this.observacoes = observacoes;
-    }
-    
-    public LocalDateTime getDataCriacao() {
-        return dataCriacao;
-    }
-    
-    public void setDataCriacao(LocalDateTime dataCriacao) {
-        this.dataCriacao = dataCriacao;
-    }
-    
-    public LocalDateTime getDataAtualizacao() {
-        return dataAtualizacao;
-    }
-    
-    public void setDataAtualizacao(LocalDateTime dataAtualizacao) {
-        this.dataAtualizacao = dataAtualizacao;
-    }
-    
-    @PreUpdate
-    public void preUpdate() {
-        this.dataAtualizacao = LocalDateTime.now();
-    }
-    
-    @Override
-    public String toString() {
-        return "Gasto{" +
-                "id=" + id +
-                ", descricao='" + descricao + '\'' +
-                ", valor=" + valor +
-                ", categoria='" + categoria + '\'' +
-                ", dataGasto=" + dataGasto +
-                ", observacoes='" + observacoes + '\'' +
-                ", dataCriacao=" + dataCriacao +
-                ", dataAtualizacao=" + dataAtualizacao +
-                '}';
+
+    @ManyToOne
+    @JoinColumn(name = "categoria_id")
+    private PlanejamentoCategoria planejamentoCategoria;
+
+    // Backing persistent categoria column to preserve compatibility with existing
+    // queries and Spring Data derived methods that expect a String 'categoria' property.
+    @Column(name = "categoria")
+    private String categoria;
+
+    @ManyToOne
+    @JoinColumn(name = "planejamento_mensal_id")
+    private PlanejamentoMensal planejamentoMensal;
+
+    @PrePersist
+    protected void onCreate() {
+        dataCriacao = LocalDateTime.now();
+        if (dataGasto == null) {
+            dataGasto = LocalDateTime.now();
+        }
+        // ensure categoria string is synced from planejamentoCategoria when creating
+        if (this.planejamentoCategoria != null && (this.categoria == null || this.categoria.isBlank())) {
+            this.categoria = this.planejamentoCategoria.getCategoria();
+        }
     }
 
-    public String getData() {
-        return null;
+    @PreUpdate
+    protected void onUpdate() {
+        dataAtualizacao = LocalDateTime.now();
+        // keep categoria string in sync with planejamentoCategoria if present
+        if (this.planejamentoCategoria != null) {
+            this.categoria = this.planejamentoCategoria.getCategoria();
+        }
+    }
+
+    public LocalDate getData() {
+        return dataGasto != null ? dataGasto.toLocalDate() : null;
+    }
+
+    public void setData(LocalDate data) {
+        if (data != null) {
+            this.dataGasto = data.atStartOfDay();
+        }
+    }
+
+    public void setPlanejamentoMensal(PlanejamentoMensal planejamentoMensal) {
+        this.planejamentoMensal = planejamentoMensal;
+    }
+
+    // Convenience accessors for legacy code that expects a `categoria` String on Gasto
+    // These map to the PlanejamentoCategoria relationship. The getter returns the
+    // categoria name (or null) and the setter will update the persistent `categoria`
+    // field and attempt to update the planejamentoCategoria name if present.
+    public String getCategoria() {
+        if (this.categoria != null && !this.categoria.isBlank()) {
+            return this.categoria;
+        }
+        return planejamentoCategoria != null ? planejamentoCategoria.getCategoria() : null;
+    }
+
+    public void setCategoria(String categoria) {
+        this.categoria = categoria;
+        if (categoria == null) {
+            return;
+        }
+        if (this.planejamentoCategoria != null) {
+            this.planejamentoCategoria.setCategoria(categoria);
+        }
     }
 }

@@ -10,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.LocalDate;
+import java.time.YearMonth;
 import java.util.List;
 import java.util.Optional;
 
@@ -23,6 +24,7 @@ public class GastoService {
     private final GastoRepository gastoRepository;
     private final NotificacaoService notificacaoService;
     private final UsuarioService usuarioService;
+    private final PlanejamentoService planejamentoService;
 
     // Operações CRUD básicas
 
@@ -35,6 +37,17 @@ public class GastoService {
             gasto.setDataGasto(LocalDateTime.now());
         }
         Gasto gastoSalvo = gastoRepository.save(gasto);
+
+        // Vincular gasto ao planejamento mensal correspondente
+        try {
+            LocalDate data = gastoSalvo.getDataGasto().toLocalDate();
+            YearMonth ym = YearMonth.of(data.getYear(), data.getMonth());
+            planejamentoService.vincularGastoAoPlanejamento(ym, gastoSalvo);
+        } catch (Exception e) {
+            // log and continue — não falhar a criação do gasto se o planejamento não puder ser atualizado
+            // Se existir um logger, usar logger.warn(...) — manter simples para evitar dependências
+            System.err.println("Aviso: falha ao vincular gasto ao planejamento: " + e.getMessage());
+        }
 
         // Envia notificação se necessário
         String emailUsuario = usuarioService.getEmailUsuarioLogado();

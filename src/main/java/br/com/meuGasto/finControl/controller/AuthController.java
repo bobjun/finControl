@@ -3,6 +3,7 @@ package br.com.meuGasto.finControl.controller;
 import br.com.meuGasto.finControl.entity.Usuario;
 import br.com.meuGasto.finControl.service.UsuarioService;
 import br.com.meuGasto.finControl.service.GastoService;
+import br.com.meuGasto.finControl.service.PlanejamentoService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -13,6 +14,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import java.time.YearMonth;
 
 @Controller
 @RequestMapping("/")
@@ -26,6 +29,9 @@ public class AuthController {
 
     @Autowired
     private GastoService gastoService;
+
+    @Autowired
+    private PlanejamentoService planejamentoService;
 
     /**
      * Página inicial - redireciona para login
@@ -102,6 +108,16 @@ public class AuthController {
         model.addAttribute("quantidadeGastos", gastoService.contarGastos());
         model.addAttribute("quantidadeCategorias", gastoService.contarCategorias());
         model.addAttribute("gastosMes", gastoService.calcularTotalGastosMes());
+
+        // Integrar com planejamento mensal atual, se existir
+        try {
+            YearMonth ym = YearMonth.now();
+            planejamentoService.buscarPorMesAno(ym).ifPresent(p -> model.addAttribute("planejamentoAtual", p));
+        } catch (Exception e) {
+            // não bloquear dashboard por erro de planejamento
+            System.err.println("Aviso: erro ao buscar planejamento atual: " + e.getMessage());
+        }
+
         return "dashboard";
     }
 }
