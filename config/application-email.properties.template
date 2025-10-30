@@ -1,0 +1,21 @@
+# Email Configuration for Production
+# Copy this file to config/application-email.properties and update with your settings
+
+# Email Server Settings
+spring.mail.host=smtp.gmail.com
+spring.mail.port=587
+spring.mail.username=your-email@gmail.com
+spring.mail.password=your-app-specific-password
+spring.mail.properties.mail.smtp.auth=true
+spring.mail.properties.mail.smtp.starttls.enable=true
+
+# Application Settings
+app.notificacao.limite-gasto=1000.00
+
+# Note: For Gmail, you need to use an App Password instead of your regular password
+# To generate an App Password:
+# 1. Go to your Google Account settings
+# 2. Enable 2-Step Verification if not already enabled
+# 3. Go to Security > App passwords
+# 4. Generate a new app password for "Mail" and your app name
+# 5. Replace spring.mail.password with the generated app password
