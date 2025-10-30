@@ -80,7 +80,11 @@ public class SecurityConfig {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOrigins(Arrays.asList("http://localhost:4200", "http://localhost:8080"));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "HEAD"));
-        configuration.setAllowedHeaders(Arrays.asList("Authorization", "Cache-Control", "Content-Type", "Accept", "X-Requested-With", "Access-Control-Allow-Origin", "Access-Control-Allow-Headers", "Origin"));
+        // Include 'baggage' and allow any header as fallback
+        configuration.setAllowedHeaders(Arrays.asList(
+                "Authorization", "Cache-Control", "Content-Type", "Accept", "X-Requested-With",
+                "Access-Control-Allow-Origin", "Access-Control-Allow-Headers", "Origin", "baggage", "*"
+        ));
         configuration.setAllowCredentials(true);
         configuration.setExposedHeaders(Arrays.asList("Authorization"));
 
