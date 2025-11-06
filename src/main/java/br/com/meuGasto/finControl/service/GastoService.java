@@ -43,20 +43,24 @@ public class GastoService {
         Gasto gastoSalvo = gastoRepository.save(gasto);
 
         // Também criar/atualizar registro em GastoPlanejamento para contabilizar no planejamento mensal
-        try {
-            GastoPlanejamento gp = gastoPlanejamentoRepository.findByGastoId(gastoSalvo.getId()).orElseGet(GastoPlanejamento::new);
-            gp.setDescricao(gastoSalvo.getDescricao());
-            gp.setCategoria(gastoSalvo.getCategoria());
-            gp.setValor(gastoSalvo.getValor());
-            gp.setGastoId(gastoSalvo.getId());
-            if (gastoSalvo.getDataGasto() != null) {
-                gp.setData(gastoSalvo.getDataGasto().toLocalDate());
-            } else {
-                gp.setData(LocalDate.now());
+        if (gastoPlanejamentoRepository != null) {
+            try {
+                GastoPlanejamento gp = gastoPlanejamentoRepository.findByGastoId(gastoSalvo.getId()).orElseGet(GastoPlanejamento::new);
+                gp.setDescricao(gastoSalvo.getDescricao());
+                gp.setCategoria(gastoSalvo.getCategoria());
+                gp.setValor(gastoSalvo.getValor());
+                gp.setGastoId(gastoSalvo.getId());
+                if (gastoSalvo.getDataGasto() != null) {
+                    gp.setData(gastoSalvo.getDataGasto().toLocalDate());
+                } else {
+                    gp.setData(LocalDate.now());
+                }
+                gastoPlanejamentoRepository.save(gp);
+            } catch (Exception e) {
+                log.error("Erro ao sincronizar GastoPlanejamento para gasto id={}: {}", gastoSalvo.getId(), e.getMessage(), e);
             }
-            gastoPlanejamentoRepository.save(gp);
-        } catch (Exception e) {
-            log.error("Erro ao sincronizar GastoPlanejamento para gasto id={}: {}", gastoSalvo.getId(), e.getMessage(), e);
+        } else {
+            log.debug("GastoPlanejamentoRepository não está disponível - sincronização de planejamento ignorada para gasto id={}", gastoSalvo.getId());
         }
 
         // Envia notificação se necessário
@@ -147,17 +151,21 @@ public class GastoService {
                     Gasto salvo = gastoRepository.save(gastoExistente);
 
                     // sincronizar GastoPlanejamento vinculado
-                    try {
-                        GastoPlanejamento gp = gastoPlanejamentoRepository.findByGastoId(salvo.getId()).orElseGet(GastoPlanejamento::new);
-                        gp.setDescricao(salvo.getDescricao());
-                        gp.setCategoria(salvo.getCategoria());
-                        gp.setValor(salvo.getValor());
-                        gp.setGastoId(salvo.getId());
-                        if (salvo.getDataGasto() != null) gp.setData(salvo.getDataGasto().toLocalDate());
-                        else gp.setData(LocalDate.now());
-                        gastoPlanejamentoRepository.save(gp);
-                    } catch (Exception e) {
-                        log.error("Erro ao sincronizar atualização de GastoPlanejamento para gasto id={}: {}", salvo.getId(), e.getMessage(), e);
+                    if (gastoPlanejamentoRepository != null) {
+                        try {
+                            GastoPlanejamento gp = gastoPlanejamentoRepository.findByGastoId(salvo.getId()).orElseGet(GastoPlanejamento::new);
+                            gp.setDescricao(salvo.getDescricao());
+                            gp.setCategoria(salvo.getCategoria());
+                            gp.setValor(salvo.getValor());
+                            gp.setGastoId(salvo.getId());
+                            if (salvo.getDataGasto() != null) gp.setData(salvo.getDataGasto().toLocalDate());
+                            else gp.setData(LocalDate.now());
+                            gastoPlanejamentoRepository.save(gp);
+                        } catch (Exception e) {
+                            log.error("Erro ao sincronizar atualização de GastoPlanejamento para gasto id={}: {}", salvo.getId(), e.getMessage(), e);
+                        }
+                    } else {
+                        log.debug("GastoPlanejamentoRepository não está disponível - sincronização de atualização ignorada para gasto id={}", salvo.getId());
                     }
 
                     return salvo;
@@ -173,10 +181,14 @@ public class GastoService {
             throw new RuntimeException("Gasto não encontrado com ID: " + id);
         }
         // primeiro remover vinculo no planejamento
-        try {
-            gastoPlanejamentoRepository.deleteByGastoId(id);
-        } catch (Exception e) {
-            log.warn("Falha ao remover GastoPlanejamento vinculado para gasto id={}: {}", id, e.getMessage());
+        if (gastoPlanejamentoRepository != null) {
+            try {
+                gastoPlanejamentoRepository.deleteByGastoId(id);
+            } catch (Exception e) {
+                log.warn("Falha ao remover GastoPlanejamento vinculado para gasto id={}: {}", id, e.getMessage());
+            }
+        } else {
+            log.debug("GastoPlanejamentoRepository não está disponível - exclusão de planejamento ignorada para gasto id={}", id);
         }
         gastoRepository.deleteById(id);
     }

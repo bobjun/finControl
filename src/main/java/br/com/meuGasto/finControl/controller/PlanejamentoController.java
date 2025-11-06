@@ -41,8 +41,9 @@ public class PlanejamentoController {
 
     @GetMapping("/{id}/resumo")
     public String resumo(@PathVariable Long id, Model model) {
+        // carregamos o planejamento por id (único) e calculamos o resumo a partir do objeto carregado
         var planejamento = repo.findById(id).orElseThrow();
-        var resumo = service.getResumo(planejamento.getMesAno());
+        var resumo = service.getResumo(planejamento);
         model.addAttribute("resumo", resumo);
         return "planejamentos/resumo";
     }

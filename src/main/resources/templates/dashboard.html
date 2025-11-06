@@ -160,7 +160,10 @@
                     </div>
                     <div class="card-body">
                         <div th:if="${planejamentoResumo != null}">
-                            <div class="row text-center">
+                            <div class="mb-2 text-muted" th:if="${planejamentoMesAno != null}">
+                                <small th:text="${'Mostrando planejamento de: ' + planejamentoMesAno}"></small>
+                            </div>
+                             <div class="row text-center">
                                 <div class="col-md-4">
                                     <h6>Planejado</h6>
                                     <p class="mb-0" th:text="${'R$ ' + #numbers.formatDecimal(planejamentoResumo.planejado,0,'POINT',2,'COMMA')}">R$ 0,00</p>
