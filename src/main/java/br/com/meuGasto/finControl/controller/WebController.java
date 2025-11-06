@@ -2,16 +2,23 @@ package br.com.meuGasto.finControl.controller;
 
 import br.com.meuGasto.finControl.entity.Usuario;
 import br.com.meuGasto.finControl.service.GastoService;
+import br.com.meuGasto.finControl.service.PlanejamentoService;
+import br.com.meuGasto.finControl.dto.PlanejamentoResumoDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+
+import java.time.YearMonth;
 
 @Controller
 public class WebController {
 
     @Autowired
     private GastoService gastoService;
+
+    @Autowired
+    private PlanejamentoService planejamentoService;
 
     @GetMapping("/")
     public String home() {
@@ -41,6 +48,17 @@ public class WebController {
         model.addAttribute("quantidadeGastos", gastoService.contarGastos());
         model.addAttribute("quantidadeCategorias", gastoService.contarCategorias());
         model.addAttribute("gastosMes", gastoService.calcularTotalGastosMes());
+
+        // Planejamento mensal do mês atual (se existir)
+        YearMonth mesAtual = YearMonth.now();
+        try {
+            PlanejamentoResumoDTO resumo = planejamentoService.getResumo(mesAtual);
+            model.addAttribute("planejamentoResumo", resumo);
+        } catch (RuntimeException e) {
+            // nenhum planejamento para o mês atual
+            model.addAttribute("planejamentoResumo", null);
+        }
+
         return "dashboard";
     }
 }

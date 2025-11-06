@@ -18,7 +18,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/auth")
-@CrossOrigin(origins = {"http://localhost:4200", "http://localhost:8080"})
+@CrossOrigin(origins = {"http://localhost:4200"})
 public class AuthController {
     
     @Autowired
@@ -32,6 +32,10 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody @Valid LoginRequest request) {
+        return authenticateAndBuildResponse(request);
+    }
+
+    private ResponseEntity<?> authenticateAndBuildResponse(LoginRequest request) {
         try {
             Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword())

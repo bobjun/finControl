@@ -33,10 +33,10 @@ public class PlanejamentoController {
         return "planejamentos/form"; // templates/planejamentos/form.html
     }
 
-    @PostMapping
+    @PostMapping("/salvar")
     public String salvar(@ModelAttribute PlanejamentoMensal planejamento) {
         repo.save(planejamento);
-        return "planejamentos/form";
+        return "redirect:/planejamentos";
     }
 
     @GetMapping("/{id}/resumo")
@@ -47,4 +47,3 @@ public class PlanejamentoController {
         return "planejamentos/resumo";
     }
 }
-

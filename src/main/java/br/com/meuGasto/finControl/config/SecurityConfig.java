@@ -56,9 +56,10 @@ public class SecurityConfig {
             .authorizeHttpRequests(authz -> authz
                 // permit preflight OPTIONS requests first
                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                .requestMatchers("/", "/auth/**", "/api/auth/**", "/api/register", "/login", "/register", "/css/**", "/js/**", "/images/**", "/h2-console/**", "/webjars/**", "/templates/**").permitAll()
+                .requestMatchers("/", "/auth/**", "/api/auth/**", "/api/register", "/api/login", "/login", "/register", "/css/**", "/js/**", "/images/**", "/h2-console/**", "/webjars/**", "/templates/**").permitAll()
                 .anyRequest().authenticated()
             )
+            // Keep formLogin for UI behaviour but API endpoints are permitted above so they won't be intercepted
             .formLogin(form -> form
                 .loginPage("/login")
                 .loginProcessingUrl("/login")
