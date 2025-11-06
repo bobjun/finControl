@@ -42,6 +42,10 @@
                         <td th:text="${p.valorPlanejadoTotal}"></td>
                         <td>
                             <a th:href="@{'/planejamentos/' + ${p.id} + '/resumo'}" class="btn btn-sm btn-outline-secondary">Resumo</a>
+                            <a th:href="@{'/planejamentos/' + ${p.id} + '/editar'}" class="btn btn-sm btn-outline-primary">Editar</a>
+                            <form th:action="@{'/planejamentos/' + ${p.id} + '/deletar'}" method="post" th:object="${p}" style="display:inline;">
+                                <button type="submit" class="btn btn-sm btn-outline-danger" onclick="return confirm('Tem certeza que deseja deletar este planejamento?');">Deletar</button>
+                            </form>
                         </td>
                     </tr>
                     </tbody>
