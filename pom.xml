@@ -9,7 +9,7 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>br.com.meuGasto</groupId>
-	<artifactId>finControl</artifactId>
+	<artifactId>finControlBackEnd</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>finControl</name>
 	<description>Gerenciamento de Gastos</description>

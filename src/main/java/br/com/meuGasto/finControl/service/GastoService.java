@@ -1,9 +1,13 @@
 package br.com.meuGasto.finControl.service;
 
 import br.com.meuGasto.finControl.entity.Gasto;
+import br.com.meuGasto.finControl.entity.GastoPlanejamento;
+import br.com.meuGasto.finControl.repository.GastoPlanejamentoRepository;
 import br.com.meuGasto.finControl.repository.GastoRepository;
 import lombok.RequiredArgsConstructor;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,8 +23,10 @@ import java.util.Optional;
 
 
 public class GastoService {
-    
+    private static final Logger log = LoggerFactory.getLogger(GastoService.class);
+
     private final GastoRepository gastoRepository;
+    private final GastoPlanejamentoRepository gastoPlanejamentoRepository;
     private final NotificacaoService notificacaoService;
     private final UsuarioService usuarioService;
 
@@ -35,6 +41,27 @@ public class GastoService {
             gasto.setDataGasto(LocalDateTime.now());
         }
         Gasto gastoSalvo = gastoRepository.save(gasto);
+
+        // Também criar/atualizar registro em GastoPlanejamento para contabilizar no planejamento mensal
+        if (gastoPlanejamentoRepository != null) {
+            try {
+                GastoPlanejamento gp = gastoPlanejamentoRepository.findByGastoId(gastoSalvo.getId()).orElseGet(GastoPlanejamento::new);
+                gp.setDescricao(gastoSalvo.getDescricao());
+                gp.setCategoria(gastoSalvo.getCategoria());
+                gp.setValor(gastoSalvo.getValor());
+                gp.setGastoId(gastoSalvo.getId());
+                if (gastoSalvo.getDataGasto() != null) {
+                    gp.setData(gastoSalvo.getDataGasto().toLocalDate());
+                } else {
+                    gp.setData(LocalDate.now());
+                }
+                gastoPlanejamentoRepository.save(gp);
+            } catch (Exception e) {
+                log.error("Erro ao sincronizar GastoPlanejamento para gasto id={}: {}", gastoSalvo.getId(), e.getMessage(), e);
+            }
+        } else {
+            log.debug("GastoPlanejamentoRepository não está disponível - sincronização de planejamento ignorada para gasto id={}", gastoSalvo.getId());
+        }
 
         // Envia notificação se necessário
         String emailUsuario = usuarioService.getEmailUsuarioLogado();
@@ -121,7 +148,27 @@ public class GastoService {
                     gastoExistente.setDataGasto(gastoAtualizado.getDataGasto());
                     gastoExistente.setObservacoes(gastoAtualizado.getObservacoes());
                     gastoExistente.setDataAtualizacao(LocalDateTime.now());
-                    return gastoRepository.save(gastoExistente);
+                    Gasto salvo = gastoRepository.save(gastoExistente);
+
+                    // sincronizar GastoPlanejamento vinculado
+                    if (gastoPlanejamentoRepository != null) {
+                        try {
+                            GastoPlanejamento gp = gastoPlanejamentoRepository.findByGastoId(salvo.getId()).orElseGet(GastoPlanejamento::new);
+                            gp.setDescricao(salvo.getDescricao());
+                            gp.setCategoria(salvo.getCategoria());
+                            gp.setValor(salvo.getValor());
+                            gp.setGastoId(salvo.getId());
+                            if (salvo.getDataGasto() != null) gp.setData(salvo.getDataGasto().toLocalDate());
+                            else gp.setData(LocalDate.now());
+                            gastoPlanejamentoRepository.save(gp);
+                        } catch (Exception e) {
+                            log.error("Erro ao sincronizar atualização de GastoPlanejamento para gasto id={}: {}", salvo.getId(), e.getMessage(), e);
+                        }
+                    } else {
+                        log.debug("GastoPlanejamentoRepository não está disponível - sincronização de atualização ignorada para gasto id={}", salvo.getId());
+                    }
+
+                    return salvo;
                 })
                 .orElseThrow(() -> new RuntimeException("Gasto não encontrado com ID: " + id));
     }
@@ -132,6 +179,16 @@ public class GastoService {
     public void excluir(Long id) {
         if (!gastoRepository.existsById(id)) {
             throw new RuntimeException("Gasto não encontrado com ID: " + id);
+        }
+        // primeiro remover vinculo no planejamento
+        if (gastoPlanejamentoRepository != null) {
+            try {
+                gastoPlanejamentoRepository.deleteByGastoId(id);
+            } catch (Exception e) {
+                log.warn("Falha ao remover GastoPlanejamento vinculado para gasto id={}: {}", id, e.getMessage());
+            }
+        } else {
+            log.debug("GastoPlanejamentoRepository não está disponível - exclusão de planejamento ignorada para gasto id={}", id);
         }
         gastoRepository.deleteById(id);
     }

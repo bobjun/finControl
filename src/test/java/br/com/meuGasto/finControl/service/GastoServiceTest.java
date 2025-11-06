@@ -2,6 +2,8 @@ package br.com.meuGasto.finControl.service;
 
 import br.com.meuGasto.finControl.entity.Gasto;
 import br.com.meuGasto.finControl.repository.GastoRepository;
+import br.com.meuGasto.finControl.repository.GastoPlanejamentoRepository;
+import br.com.meuGasto.finControl.entity.GastoPlanejamento;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -17,6 +19,7 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -24,6 +27,9 @@ public class GastoServiceTest {
 
     @Mock
     private GastoRepository gastoRepository;
+
+    @Mock
+    private GastoPlanejamentoRepository gastoPlanejamentoRepository;
 
     @Mock
     private NotificacaoService notificacaoService;
@@ -52,12 +58,17 @@ public class GastoServiceTest {
         when(usuarioService.getEmailUsuarioLogado()).thenReturn("test@example.com");
         doNothing().when(notificacaoService).notificarGastoAlto(any(Gasto.class), anyString());
 
+        // preparar comportamento do repositório de planejamento
+        when(gastoPlanejamentoRepository.findByGastoId(anyLong())).thenReturn(Optional.empty());
+        when(gastoPlanejamentoRepository.save(any(GastoPlanejamento.class))).thenAnswer(i -> i.getArgument(0));
+
         Gasto resultado = gastoService.salvar(gastoMock);
 
         assertNotNull(resultado);
         assertEquals(gastoMock.getValor(), resultado.getValor());
         verify(gastoRepository).save(any(Gasto.class));
         verify(notificacaoService).notificarGastoAlto(any(Gasto.class), anyString());
+        verify(gastoPlanejamentoRepository).save(any(GastoPlanejamento.class));
     }
 
     @Test
@@ -66,11 +77,16 @@ public class GastoServiceTest {
         when(gastoRepository.save(any(Gasto.class))).thenReturn(gastoMock);
         when(usuarioService.getEmailUsuarioLogado()).thenReturn("test@example.com");
 
+        // preparar comportamento do repositório de planejamento
+        when(gastoPlanejamentoRepository.findByGastoId(anyLong())).thenReturn(Optional.empty());
+        when(gastoPlanejamentoRepository.save(any(GastoPlanejamento.class))).thenAnswer(i -> i.getArgument(0));
+
         Gasto resultado = gastoService.salvar(gastoMock);
 
         assertNotNull(resultado);
         assertNotNull(resultado.getDataGasto());
         verify(gastoRepository).save(any(Gasto.class));
+        verify(gastoPlanejamentoRepository).save(any(GastoPlanejamento.class));
     }
 
     @Test

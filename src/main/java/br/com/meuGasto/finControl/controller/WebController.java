@@ -1,0 +1,67 @@
+package br.com.meuGasto.finControl.controller;
+
+import br.com.meuGasto.finControl.entity.Usuario;
+import br.com.meuGasto.finControl.service.GastoService;
+import br.com.meuGasto.finControl.service.PlanejamentoService;
+import br.com.meuGasto.finControl.dto.PlanejamentoResumoDTO;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+
+import java.time.YearMonth;
+
+@Controller
+public class WebController {
+
+    @Autowired
+    private GastoService gastoService;
+
+    @Autowired
+    private PlanejamentoService planejamentoService;
+
+    @GetMapping("/")
+    public String home() {
+        return "redirect:/login";
+    }
+
+    @GetMapping("/login")
+    public String login(Model model, String error, String logout) {
+        if (error != null) {
+            model.addAttribute("error", "Email ou senha inválidos!");
+        }
+        if (logout != null) {
+            model.addAttribute("message", "Logout realizado com sucesso!");
+        }
+        return "login";
+    }
+
+    @GetMapping("/register")
+    public String register(Model model) {
+        model.addAttribute("usuario", new Usuario());
+        return "register";
+    }
+
+    @GetMapping("/dashboard")
+    public String dashboard(Model model) {
+        model.addAttribute("totalGastos", gastoService.calcularTotalGastos());
+        model.addAttribute("quantidadeGastos", gastoService.contarGastos());
+        model.addAttribute("quantidadeCategorias", gastoService.contarCategorias());
+        model.addAttribute("gastosMes", gastoService.calcularTotalGastosMes());
+
+        // Planejamento mensal do mês atual (se existir) ou último existente
+        YearMonth mesAtual = YearMonth.now();
+        try {
+            PlanejamentoResumoDTO resumo = planejamentoService.getResumoOuUltimo(mesAtual);
+            model.addAttribute("planejamentoResumo", resumo);
+            // informa qual mesAno está sendo mostrado
+            model.addAttribute("planejamentoMesAno", resumo.getMesAno());
+        } catch (RuntimeException e) {
+            // nenhum planejamento cadastrado
+            model.addAttribute("planejamentoResumo", null);
+            model.addAttribute("planejamentoMesAno", null);
+        }
+
+        return "dashboard";
+    }
+}

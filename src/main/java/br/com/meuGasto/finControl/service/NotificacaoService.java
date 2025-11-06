@@ -5,6 +5,7 @@ import br.com.meuGasto.finControl.exception.EmailSendException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.mail.MailException;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -17,8 +18,8 @@ import java.time.format.DateTimeFormatter;
 import java.util.Locale;
 
 @Service
-@RequiredArgsConstructor
 @Slf4j
+@ConditionalOnProperty(name = "spring.mail.host")
 public class NotificacaoService {
 
     private final JavaMailSender mailSender;
@@ -29,10 +30,31 @@ public class NotificacaoService {
     @Value("${app.notificacao.limite-gasto:1000.00}")
     private BigDecimal limiteGasto;
 
-    @Value("${spring.mail.username}")
+    @Value("${spring.mail.username:}")
     private String remetente;
 
+    @Value("${spring.mail.host:}")
+    private String mailHost;
+
+    public NotificacaoService(JavaMailSender mailSender, RetryTemplate retryTemplate) {
+        this.mailSender = mailSender;
+        this.retryTemplate = retryTemplate;
+    }
+
+    private boolean isEmailConfigured() {
+        // For tests we may not set mailHost; rely on remetente presence to decide if email should be sent.
+        // Also ensure mailSender is present.
+        return mailSender != null
+            && remetente != null && !remetente.isEmpty()
+            && !remetente.equals("default@example.com");
+    }
+
     private void enviarEmail(SimpleMailMessage message) {
+        if (!isEmailConfigured()) {
+            log.warn("Serviço de email não está configurado corretamente. Pulando envio de email.");
+            return;
+        }
+
         try {
             retryTemplate.execute(context -> {
                 try {

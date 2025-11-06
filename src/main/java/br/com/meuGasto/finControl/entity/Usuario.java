@@ -2,10 +2,12 @@ package br.com.meuGasto.finControl.entity;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
+import org.hibernate.annotations.SQLInsert;
 import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "usuarios")
+@SQLInsert(sql="INSERT INTO usuarios(nome, email, senha, ativo, data_criacao, data_atualizacao) SELECT ?, ?, ?, ?, ?, ? WHERE NOT EXISTS(SELECT 1 FROM usuarios WHERE email = ?)")
 public class Usuario {
     
     @Id
@@ -20,7 +22,7 @@ public class Usuario {
     @NotBlank(message = "Email é obrigatório")
     @Email(message = "Email deve ter formato válido")
     @Size(max = 100, message = "Email deve ter no máximo 100 caracteres")
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false)
     private String email;
     
     @NotBlank(message = "Senha é obrigatória")

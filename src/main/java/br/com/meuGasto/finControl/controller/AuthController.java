@@ -1,21 +1,24 @@
 package br.com.meuGasto.finControl.controller;
 
+import br.com.meuGasto.finControl.dto.LoginRequest;
+import br.com.meuGasto.finControl.dto.LoginResponse;
 import br.com.meuGasto.finControl.entity.Usuario;
 import br.com.meuGasto.finControl.service.UsuarioService;
-import br.com.meuGasto.finControl.service.GastoService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import org.springframework.web.bind.annotation.*;
 
-@Controller
-@RequestMapping("/")
+import java.util.Map;
+
+@RestController
+@RequestMapping("/api/auth")
+@CrossOrigin(origins = {"http://localhost:4200"})
 public class AuthController {
     
     @Autowired
@@ -25,83 +28,63 @@ public class AuthController {
     private PasswordEncoder passwordEncoder;
 
     @Autowired
-    private GastoService gastoService;
+    private AuthenticationManager authenticationManager;
 
-    /**
-     * Página inicial - redireciona para login
-     */
-    @GetMapping
-    public String home() {
-        return "redirect:/login";
+    @PostMapping("/login")
+    public ResponseEntity<?> login(@RequestBody @Valid LoginRequest request) {
+        return authenticateAndBuildResponse(request);
     }
-    
-    /**
-     * Página de login
-     */
-    @GetMapping("/login")
-    public String login(Model model, String error, String logout) {
-        if (error != null) {
-            model.addAttribute("error", "Email ou senha inválidos!");
-        }
-        if (logout != null) {
-            model.addAttribute("message", "Logout realizado com sucesso!");
-        }
-        return "login";
-    }
-    
-    /**
-     * Página de registro
-     */
-    @GetMapping("/register")
-    public String register(Model model) {
-        model.addAttribute("usuario", new Usuario());
-        return "register";
-    }
-    
-    /**
-     * Processar registro de usuário
-     */
-    @PostMapping("/register")
-    public String processRegister(@Valid Usuario usuario, BindingResult result, 
-                                 Model model, RedirectAttributes redirectAttributes) {
-        
-        if (result.hasErrors()) {
-            return "register";
-        }
-        
-        // Verificar se email já existe
-        if (usuarioService.existeUsuarioComEmail(usuario.getEmail())) {
-            model.addAttribute("error", "Email já está em uso!");
-            return "register";
-        }
-        
-        // Validar dados do usuário
-        if (!usuarioService.validarUsuario(usuario)) {
-            model.addAttribute("error", "Dados inválidos!");
-            return "register";
-        }
-        
+
+    private ResponseEntity<?> authenticateAndBuildResponse(LoginRequest request) {
         try {
-            // Criptografa a senha antes de salvar
-            usuario.setSenha(passwordEncoder.encode(usuario.getSenha()));
-            usuarioService.salvar(usuario);
-            redirectAttributes.addFlashAttribute("message", "Usuário registrado com sucesso! Faça login para continuar.");
-            return "redirect:/login";
+            Authentication authentication = authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword())
+            );
+
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+
+            String token = "dummy-token"; // Substitua por geração real de token se necessário
+
+            return ResponseEntity.ok(new LoginResponse(
+                "Login realizado com sucesso",
+                token,
+                authentication.getName()
+            ));
         } catch (Exception e) {
-            model.addAttribute("error", "Erro ao registrar usuário: " + e.getMessage());
-            return "register";
+            return ResponseEntity.badRequest().body(Map.of(
+                "message", "Credenciais inválidas",
+                "error", e.getMessage()
+            ));
         }
     }
-    
-    /**
-     * Dashboard após login
-     */
-    @GetMapping("/dashboard")
-    public String dashboard(Model model) {
-        model.addAttribute("totalGastos", gastoService.calcularTotalGastos());
-        model.addAttribute("quantidadeGastos", gastoService.contarGastos());
-        model.addAttribute("quantidadeCategorias", gastoService.contarCategorias());
-        model.addAttribute("gastosMes", gastoService.calcularTotalGastosMes());
-        return "dashboard";
+
+    @PostMapping("/register")
+    public ResponseEntity<?> register(@RequestBody @Valid Usuario usuario) {
+        try {
+            if (usuarioService.existeUsuarioComEmail(usuario.getEmail())) {
+                return ResponseEntity.badRequest().body(Map.of(
+                    "message", "Email já está em uso!"
+                ));
+            }
+
+            if (!usuarioService.validarUsuario(usuario)) {
+                return ResponseEntity.badRequest().body(Map.of(
+                    "message", "Dados inválidos!"
+                ));
+            }
+
+            usuario.setSenha(passwordEncoder.encode(usuario.getSenha()));
+            Usuario savedUser = usuarioService.salvar(usuario);
+
+            return ResponseEntity.ok(Map.of(
+                "message", "Usuário registrado com sucesso!",
+                "userId", savedUser.getId()
+            ));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(Map.of(
+                "message", "Erro ao registrar usuário",
+                "error", e.getMessage()
+            ));
+        }
     }
 }
