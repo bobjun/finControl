@@ -52,7 +52,7 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http, DaoAuthenticationProvider authProvider) throws Exception {
         http
             .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-            .csrf(csrf -> csrf.disable())
+            //csrf(csrf -> csrf.disable())
             .authorizeHttpRequests(authz -> authz
                 // permit preflight OPTIONS requests first
                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
