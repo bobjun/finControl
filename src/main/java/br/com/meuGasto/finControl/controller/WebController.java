@@ -49,14 +49,17 @@ public class WebController {
         model.addAttribute("quantidadeCategorias", gastoService.contarCategorias());
         model.addAttribute("gastosMes", gastoService.calcularTotalGastosMes());
 
-        // Planejamento mensal do mês atual (se existir)
+        // Planejamento mensal do mês atual (se existir) ou último existente
         YearMonth mesAtual = YearMonth.now();
         try {
-            PlanejamentoResumoDTO resumo = planejamentoService.getResumo(mesAtual);
+            PlanejamentoResumoDTO resumo = planejamentoService.getResumoOuUltimo(mesAtual);
             model.addAttribute("planejamentoResumo", resumo);
+            // informa qual mesAno está sendo mostrado
+            model.addAttribute("planejamentoMesAno", resumo.getMesAno());
         } catch (RuntimeException e) {
-            // nenhum planejamento para o mês atual
+            // nenhum planejamento cadastrado
             model.addAttribute("planejamentoResumo", null);
+            model.addAttribute("planejamentoMesAno", null);
         }
 
         return "dashboard";
