@@ -17,12 +17,15 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.util.Arrays;
+import java.util.List;
 
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
 
     private final CustomUserDetailsService userDetailsService;
+
+    private static final String Login = "login";
 
     // Use constructor injection to avoid circular references with @Configuration proxying
     public SecurityConfig(CustomUserDetailsService userDetailsService) {
@@ -56,19 +59,19 @@ public class SecurityConfig {
             .authorizeHttpRequests(authz -> authz
                 // permit preflight OPTIONS requests first
                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                .requestMatchers("/", "/auth/**", "/api/auth/**", "/api/register", "/api/login", "/login", "/register", "/css/**", "/js/**", "/images/**", "/h2-console/**", "/webjars/**", "/templates/**").permitAll()
+                .requestMatchers("/", "/auth/**", "/api/auth/**", "/api/register", "/api/Login", "/Login", "/register", "/css/**", "/js/**", "/images/**", "/h2-console/**", "/webjars/**", "/templates/**").permitAll()
                 .anyRequest().authenticated()
             )
             // Keep formLogin for UI behaviour but API endpoints are permitted above so they won't be intercepted
             .formLogin(form -> form
-                .loginPage("/login")
-                .loginProcessingUrl("/login")
+                .loginPage("/Login")
+                .loginProcessingUrl("/Login")
                 .defaultSuccessUrl("/dashboard", true)
-                .failureUrl("/login?error=true")
+                .failureUrl("/Login?error=true")
                 .permitAll()
             )
             .logout(logout -> logout
-                .logoutSuccessUrl("/login?logout=true")
+                .logoutSuccessUrl("/Login?logout=true")
                 .permitAll()
             )
             .authenticationProvider(authProvider);
@@ -87,7 +90,7 @@ public class SecurityConfig {
                 "Access-Control-Allow-Origin", "Access-Control-Allow-Headers", "Origin", "baggage", "*"
         ));
         configuration.setAllowCredentials(true);
-        configuration.setExposedHeaders(Arrays.asList("Authorization"));
+        configuration.setExposedHeaders(List.of("Authorization"));
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
