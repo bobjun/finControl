@@ -2,89 +2,72 @@ package br.com.meuGasto.finControl.controller;
 
 import br.com.meuGasto.finControl.dto.LoginRequest;
 import br.com.meuGasto.finControl.dto.LoginResponse;
-import br.com.meuGasto.finControl.entity.Usuario;
-import br.com.meuGasto.finControl.service.UsuarioService;
-import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
+import br.com.meuGasto.finControl.config.JwtUtil;
+import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
 
 @RestController
-@RequestMapping("/api/auth")
-@CrossOrigin(origins = {"http://localhost:4200"})
+@RequestMapping("/api")
 public class AuthController {
-    
-    @Autowired
-    private UsuarioService usuarioService;
-    
-    @Autowired
-    private PasswordEncoder passwordEncoder;
 
-    @Autowired
-    private AuthenticationManager authenticationManager;
+    private final AuthenticationManager authenticationManager;
+    private final JwtUtil jwtUtil;
 
-    @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody @Valid LoginRequest request) {
-        return authenticateAndBuildResponse(request);
+    public AuthController(AuthenticationManager authenticationManager, JwtUtil jwtUtil) {
+        this.authenticationManager = authenticationManager;
+        this.jwtUtil = jwtUtil;
     }
 
-    private ResponseEntity<?> authenticateAndBuildResponse(LoginRequest request) {
+    @PostMapping("/login")
+    public ResponseEntity<?> login(@RequestBody LoginRequest request, HttpServletResponse response) {
         try {
             Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword())
+                    new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword())
             );
 
             SecurityContextHolder.getContext().setAuthentication(authentication);
 
-            String token = "dummy-token"; // Substitua por geração real de token se necessário
+            String token = jwtUtil.generateToken(authentication.getName());
 
-            return ResponseEntity.ok(new LoginResponse(
-                "Login realizado com sucesso",
-                token,
-                authentication.getName()
-            ));
+            ResponseCookie cookie = ResponseCookie.from("jwt", token)
+                    .httpOnly(true)
+                    .secure(false) // false em localhost; em produção usar true (HTTPS)
+                    .path("/")
+                    .maxAge(24 * 60 * 60)
+                    .sameSite("None")
+                    .build();
+
+            return ResponseEntity.ok()
+                    .header(HttpHeaders.SET_COOKIE, cookie.toString())
+                    .body(new LoginResponse("Login realizado com sucesso", token, authentication.getName()));
+
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body(Map.of(
-                "message", "Credenciais inválidas",
-                "error", e.getMessage()
-            ));
+            return ResponseEntity.status(401).body(Map.of("message", "Credenciais inválidas"));
         }
     }
 
-    @PostMapping("/register")
-    public ResponseEntity<?> register(@RequestBody @Valid Usuario usuario) {
-        try {
-            if (usuarioService.existeUsuarioComEmail(usuario.getEmail())) {
-                return ResponseEntity.badRequest().body(Map.of(
-                    "message", "Email já está em uso!"
-                ));
-            }
+    @PostMapping("/logout")
+    public ResponseEntity<?> logout(HttpServletResponse response) {
+        // remove cookie do cliente
+        ResponseCookie cookie = ResponseCookie.from("jwt", "")
+                .httpOnly(true)
+                .secure(false)
+                .path("/")
+                .maxAge(0)
+                .sameSite("None")
+                .build();
 
-            if (!usuarioService.validarUsuario(usuario)) {
-                return ResponseEntity.badRequest().body(Map.of(
-                    "message", "Dados inválidos!"
-                ));
-            }
-
-            usuario.setSenha(passwordEncoder.encode(usuario.getSenha()));
-            Usuario savedUser = usuarioService.salvar(usuario);
-
-            return ResponseEntity.ok(Map.of(
-                "message", "Usuário registrado com sucesso!",
-                "userId", savedUser.getId()
-            ));
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(Map.of(
-                "message", "Erro ao registrar usuário",
-                "error", e.getMessage()
-            ));
-        }
+        return ResponseEntity.ok()
+                .header(HttpHeaders.SET_COOKIE, cookie.toString())
+                .body(Map.of("message", "Logout realizado"));
     }
 }

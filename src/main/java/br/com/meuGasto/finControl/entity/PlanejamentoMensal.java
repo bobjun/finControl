@@ -12,7 +12,7 @@ import java.util.List;
 public class PlanejamentoMensal {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
     @Setter

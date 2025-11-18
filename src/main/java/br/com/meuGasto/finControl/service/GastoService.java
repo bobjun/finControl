@@ -347,16 +347,13 @@ public class GastoService {
         if (gasto.getValor() == null || gasto.getValor().compareTo(BigDecimal.ZERO) <= 0) {
             return true;
         }
-        if (gasto.getCategoria() == null || gasto.getCategoria().trim().isEmpty()) {
-            return true;
-        }
-        return false;
+        return gasto.getCategoria() == null || gasto.getCategoria().trim().isEmpty();
     }
     
     /**
      * Verifica se existe gasto com o ID
      */
     public boolean existeGasto(Long id) {
-        return gastoRepository.existsById(id);
+        return !gastoRepository.existsById(id);
     }
 }

@@ -1,0 +1,263 @@
+{
+  "info": {
+    "name": "finControl - API de Movimentações",
+    "description": "Coleção de testes para a API de Movimentações do finControl",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Movimentações",
+      "item": [
+        {
+          "name": "Listar Movimentações",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/movimentacoes?page=0&size=10",
+              "host": ["{{base_url}}"],
+              "path": ["api", "movimentacoes"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "0"
+                },
+                {
+                  "key": "size",
+                  "value": "10"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Buscar Movimentação por ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/movimentacoes/1",
+              "host": ["{{base_url}}"],
+              "path": ["api", "movimentacoes", "1"]
+            }
+          }
+        },
+        {
+          "name": "Criar Movimentação",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"descricao\": \"Almoço\",\n  \"valor\": 45.50,\n  \"categoria\": \"Alimentação\",\n  \"data\": \"2025-11-14T12:30:00\",\n  \"observacoes\": \"Restaurante XYZ\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/movimentacoes",
+              "host": ["{{base_url}}"],
+              "path": ["api", "movimentacoes"]
+            }
+          }
+        },
+        {
+          "name": "Atualizar Movimentação",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"descricao\": \"Almoço (atualizado)\",\n  \"valor\": 50.00,\n  \"categoria\": \"Alimentação\",\n  \"data\": \"2025-11-14T12:30:00\",\n  \"observacoes\": \"Restaurante XYZ - muito bom\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/movimentacoes/1",
+              "host": ["{{base_url}}"],
+              "path": ["api", "movimentacoes", "1"]
+            }
+          }
+        },
+        {
+          "name": "Excluir Movimentação",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/movimentacoes/1",
+              "host": ["{{base_url}}"],
+              "path": ["api", "movimentacoes", "1"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Relatórios",
+      "item": [
+        {
+          "name": "Resumo Financeiro",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/movimentacoes/resumo?dias=30",
+              "host": ["{{base_url}}"],
+              "path": ["api", "movimentacoes", "resumo"],
+              "query": [
+                {
+                  "key": "dias",
+                  "value": "30"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Evolução Financeira",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/movimentacoes/evolucao?dias=30",
+              "host": ["{{base_url}}"],
+              "path": ["api", "movimentacoes", "evolucao"],
+              "query": [
+                {
+                  "key": "dias",
+                  "value": "30"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Despesas por Categoria",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/movimentacoes/despesas/categorias?dias=30",
+              "host": ["{{base_url}}"],
+              "path": ["api", "movimentacoes", "despesas", "categorias"],
+              "query": [
+                {
+                  "key": "dias",
+                  "value": "30"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Previsão Financeira",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/movimentacoes/previsao",
+              "host": ["{{base_url}}"],
+              "path": ["api", "movimentacoes", "previsao"]
+            }
+          }
+        },
+        {
+          "name": "Exportar CSV",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/movimentacoes/export",
+              "host": ["{{base_url}}"],
+              "path": ["api", "movimentacoes", "export"]
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:8080",
+      "type": "string"
+    },
+    {
+      "key": "token",
+      "value": "seu_token_jwt_aqui",
+      "type": "string"
+    }
+  ]
+}
+

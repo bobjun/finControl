@@ -2,6 +2,7 @@ package br.com.meuGasto.finControl;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.retry.annotation.EnableRetry;
@@ -10,6 +11,7 @@ import org.springframework.retry.annotation.EnableRetry;
 @EnableScheduling
 @EnableRetry
 @EnableConfigurationProperties
+@EnableCaching
 public class FinControlApplication {
 
 	public static void main(String[] args) {

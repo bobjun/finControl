@@ -9,7 +9,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 
@@ -31,8 +30,6 @@ public class UsuarioServiceTest {
     @InjectMocks
     private UsuarioService usuarioService;
 
-    @Mock
-    private SecurityContext securityContext;
 
     @Mock
     private Authentication authentication;
@@ -186,8 +183,11 @@ public class UsuarioServiceTest {
         UserDetails userDetails = mock(UserDetails.class);
         when(userDetails.getUsername()).thenReturn("test@example.com");
         when(authentication.getPrincipal()).thenReturn(userDetails);
-        SecurityContextHolder.setContext(securityContext);
+
+        // Mock SecurityContextHolder.getContext() and set authentication
+        var securityContext = mock(org.springframework.security.core.context.SecurityContext.class);
         when(securityContext.getAuthentication()).thenReturn(authentication);
+        SecurityContextHolder.setContext(securityContext);
 
         String resultado = usuarioService.getEmailUsuarioLogado();
 

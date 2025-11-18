@@ -22,6 +22,11 @@ public class Gasto {
     @DecimalMin(value = "0.01", message = "Valor deve ser maior que zero")
     @Column(nullable = false, precision = 10, scale = 2)
     private BigDecimal valor;
+
+    @NotBlank(message = "Tipo é obrigatória")
+    @Size(max = 255, message = "Tipo deve ter no máximo 255 caracteres")
+    @Column(nullable = false)
+    private String tipo;
     
     @NotBlank(message = "Categoria é obrigatória")
     @Size(max = 100, message = "Categoria deve ter no máximo 100 caracteres")
@@ -47,11 +52,12 @@ public class Gasto {
         this.dataAtualizacao = LocalDateTime.now();
     }
     
-    public Gasto(String descricao, BigDecimal valor, String categoria) {
+    public Gasto(String descricao, BigDecimal valor, String categoria, String tipo) {
         this();
         this.descricao = descricao;
         this.valor = valor;
         this.categoria = categoria;
+        this.tipo = tipo;
         this.dataGasto = LocalDateTime.now();
     }
     
@@ -70,6 +76,13 @@ public class Gasto {
     
     public void setDescricao(String descricao) {
         this.descricao = descricao;
+    }
+
+    public void setTipo(String tipo) {
+        this.tipo = tipo;
+    }
+    public String getTipo() {
+        return tipo;
     }
     
     public BigDecimal getValor() {
@@ -132,6 +145,7 @@ public class Gasto {
                 ", descricao='" + descricao + '\'' +
                 ", valor=" + valor +
                 ", categoria='" + categoria + '\'' +
+                ", tipo='" + tipo + '\'' +
                 ", dataGasto=" + dataGasto +
                 ", observacoes='" + observacoes + '\'' +
                 ", dataCriacao=" + dataCriacao +
