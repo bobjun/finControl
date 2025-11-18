@@ -2,6 +2,7 @@ package br.com.meuGasto.finControl.controller;
 
 import br.com.meuGasto.finControl.dto.LoginRequest;
 import br.com.meuGasto.finControl.dto.LoginResponse;
+import br.com.meuGasto.finControl.config.JwtUtil;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -21,6 +22,9 @@ public class AuthPublicController {
     @Autowired
     private AuthenticationManager authenticationManager;
 
+    @Autowired
+    private JwtUtil jwtUtil;
+
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody @Valid LoginRequest request) {
         try {
@@ -30,7 +34,7 @@ public class AuthPublicController {
 
             SecurityContextHolder.getContext().setAuthentication(authentication);
 
-            String token = "dummy-token"; // keep existing behavior
+            String token = jwtUtil.generateToken(authentication.getName());
 
             return ResponseEntity.ok(new LoginResponse(
                 "Login realizado com sucesso",
@@ -45,4 +49,3 @@ public class AuthPublicController {
         }
     }
 }
-

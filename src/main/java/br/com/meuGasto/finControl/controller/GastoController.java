@@ -70,7 +70,7 @@ public class GastoController {
     @PutMapping("/{id}")
     public ResponseEntity<?> atualizarGasto(@PathVariable Long id, @Valid @RequestBody Gasto gasto) {
         try {
-            if (!gastoService.existeGasto(id)) {
+            if (gastoService.existeGasto(id)) {
                 return ResponseEntity.notFound().build();
             }
             
@@ -95,7 +95,7 @@ public class GastoController {
     @DeleteMapping("/{id}")
     public ResponseEntity<?> excluirGasto(@PathVariable Long id) {
         try {
-            if (!gastoService.existeGasto(id)) {
+            if (gastoService.existeGasto(id)) {
                 return ResponseEntity.notFound().build();
             }
             
