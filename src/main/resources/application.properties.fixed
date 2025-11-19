@@ -1,0 +1,105 @@
+# Nome da aplicacao
+spring.application.name=finControl
+
+# Load external email configuration
+spring.config.import=optional:file:config/application-email.properties
+
+# Configuracao da porta do servidor
+#server.port=8082
+
+# Configuracao do banco de dados SQLite
+spring.datasource.url=jdbc:sqlite:fincontrol.db
+spring.datasource.driver-class-name=org.sqlite.JDBC
+spring.datasource.username=sa
+spring.datasource.password=sa
+
+# Hikari config - uma unica conexao para SQLite
+spring.datasource.hikari.minimum-idle=1
+spring.datasource.hikari.connection-timeout=60000
+spring.datasource.hikari.idle-timeout=45000
+spring.datasource.hikari.max-lifetime=60000
+spring.datasource.hikari.pool-name=HikariPool-1
+
+# Evita warnings de Hibernate
+spring.jpa.properties.hibernate.temp.use_jdbc_metadata_defaults=false
+
+# Configuracao do JPA/Hibernate
+spring.jpa.database-platform=org.hibernate.community.dialect.SQLiteDialect
+spring.jpa.hibernate.ddl-auto=update
+spring.jpa.show-sql=true
+
+# Configuracoes especificas do SQLite
+spring.jpa.properties.hibernate.dialect=org.hibernate.community.dialect.SQLiteDialect
+spring.jpa.properties.hibernate.format_sql=true
+spring.jpa.properties.hibernate.use_sql_comments=true
+
+# Configuracoes de performance
+spring.jpa.properties.hibernate.jdbc.batch_size=25
+spring.jpa.properties.hibernate.cache.use_second_level_cache=false
+spring.jpa.properties.hibernate.cache.use_query_cache=false
+
+# Email configuration (default values, override in application-email.properties)
+spring.mail.username=${MAIL_USERNAME:noreply@example.com}
+spring.mail.password=${MAIL_PASSWORD:password}
+spring.mail.test-connection=false
+
+# Application specific settings
+# Configuracoes do pool de conexoes
+spring.datasource.hikari.maximum-pool-size=1
+spring.datasource.type=com.zaxxer.hikari.HikariDataSource
+
+# Configuracoes de seguranca
+spring.security.user.name=admin
+spring.security.user.password=admin
+
+# Configuracoes adicionais para resolver problemas de compatibilidade
+spring.jpa.properties.hibernate.jdbc.use_get_generated_keys=false
+spring.jpa.properties.hibernate.id.new_generator_mappings=false
+spring.jpa.properties.hibernate.jdbc.batch_versioned_data=false
+spring.jpa.properties.hibernate.globally_quoted_identifiers=true
+
+# Actuator
+management.endpoints.web.exposure.include=*
+management.endpoint.health.show-details=always
+
+# Logging
+logging.level.br.com.meuGasto=DEBUG
+logging.pattern.console=%d{yyyy-MM-dd HH:mm:ss} - %msg%n
+
+# Swagger UI
+springdoc.swagger-ui.path=/swagger-ui.html
+springdoc.api-docs.path=/api-docs
+
+# Cache
+spring.cache.type=simple
+
+# Configuracoes de Performance
+spring.jpa.properties.hibernate.generate_statistics=true
+spring.jpa.properties.hibernate.order_inserts=true
+spring.jpa.properties.hibernate.order_updates=true
+
+# Configuracoes de Seguranca Adicionais
+server.servlet.session.timeout=30m
+security.basic.enabled=true
+server.servlet.session.cookie.http-only=true
+server.servlet.session.cookie.secure=true
+
+# Configuracoes de Email
+spring.mail.host=smtp.gmail.com
+spring.mail.port=587
+spring.mail.properties.mail.smtp.ssl.trust=smtp.gmail.com
+spring.mail.properties.mail.smtp.connectiontimeout=5000
+spring.mail.properties.mail.smtp.timeout=5000
+spring.mail.properties.mail.smtp.writetimeout=5000
+
+# Retry Configuration
+spring.retry.max-attempts=3
+spring.retry.initial-interval=1000
+spring.retry.multiplier=2.0
+spring.retry.max-interval=10000
+
+# Configuracao do limite de gasto para notificacao
+app.notificacao.limite-gasto=1000.00
+
+
+# segredo - troque para algo forte em produ

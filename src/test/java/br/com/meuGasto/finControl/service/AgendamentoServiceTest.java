@@ -21,6 +21,7 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 public class AgendamentoServiceTest {
 
+
     @Mock
     private RelatorioService relatorioService;
 
